@@ -29,27 +29,6 @@ sweep_config = {
     },
 }
 
-old_model_args = {
-    'fp16':False,
- #   'wandb_project': 'Roberta Colab',
- #   'num_train_epochs': 3,
-    'overwrite_output_dir':True,
-    #'learning_rate': 1e-5,
-    #'use_early_stopping': True,
-    #'early_stopping_delta': 0.01,
-    #'early_stopping_metric': 'mcc',
-    #'early_stopping_metric_minimize': False,
-    #'early_stopping_patience': 5,
-    'evaluate_during_training': True,
-    #'evaluate_during_training_steps': 1000,
-    'reprocess_input_data': True,
-    'manual_seed': 4,
-    'use_multiprocessing': True,
-    'train_batch_size': 16,
-    'eval_batch_size': 8,
-  #  'labels_list': ["true", "false"]
-}
-
 model_args = ClassificationArgs()
 model_args.reprocess_input_data = True
 model_args.overwrite_output_dir = True
