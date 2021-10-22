@@ -24,8 +24,8 @@ sweep_config = {
     "method": "grid",  # grid, random
     "metric": {"name": "eval_loss", "goal": "minimize"},
        "parameters": {
-        "num_train_epochs": {"values": [2, 3, 5]},
-        "learning_rate": {"values": [5e-4, 1e-5, 5e-5, 1e-6]},
+        "num_train_epochs": {"values": [5]},
+        "learning_rate": {"values": [1e-5]},
     },
 }
 
