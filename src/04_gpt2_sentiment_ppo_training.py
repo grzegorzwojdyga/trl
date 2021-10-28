@@ -279,10 +279,10 @@ df_results
 """Looking at the reward mean/median of the generated sequences we observe a significant difference."""
 
 print('mean:')
-display(df_results.mean())
+print(df_results.mean())
 print()
 print('median:')
-display(df_results.median())
+print(df_results.median())
 
 """## Save model
 Finally, we save the model to disk for later usage.
