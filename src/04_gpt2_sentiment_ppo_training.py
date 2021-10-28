@@ -52,7 +52,7 @@ config = {
     "steps": 25600,
     "batch_size": 256,
     "forward_batch_size": 16,
-    "ppo_epochs": 4,   
+    "ppo_epochs": 4,
     "txt_in_len": 5,
     "txt_out_len": 15,
     "lr": 1.41e-5,
@@ -63,7 +63,7 @@ config = {
     "lam":0.95,
     "cliprange": .2,
     "cliprange_value":.2,
-    "vf_coef":.1, 
+    "vf_coef":.1,
 }
 
 """You can see that we load a GPT2 model called `gpt2_imdb`. This model was additionally fine-tuned on the IMDB dataset for 1 epoch with the huggingface [script](https://github.com/huggingface/transformers/blob/master/examples/run_language_modeling.py) (no special settings). The other parameters are mostly taken from the original paper ["Fine-Tuning Language Models from Human Preferences"](
@@ -82,7 +82,7 @@ The IMDB dataset contains 50k movie review annotated with "positive"/"negative" 
 """
 
 # makes sure you download the imdb-dataset in the data folder
-df = pd.read_csv('../data/imdb-dataset.csv')
+df = pd.read_csv('IMDBDataset.csv')
 
 # make sure the comments are long enough
 df = df.loc[df['review'].str.len() > 500]
@@ -178,12 +178,12 @@ for epoch in tqdm(range(int(np.ceil(config["steps"]/config['batch_size'])))):
     game_data = dict()
     timing = dict()
     t0 = time.time()
-    
+
     #### get a batch from the dataset
     df_batch = df.sample(config['batch_size'])
     game_data['query'] = df_batch['query'].tolist()
     query_tensors = torch.stack(df_batch['tokens'].tolist())
-    
+
     #### get response from gpt2
     t = time.time()
     total_length = config['txt_in_len']+config['txt_out_len']
@@ -199,7 +199,7 @@ for epoch in tqdm(range(int(np.ceil(config["steps"]/config['batch_size'])))):
     #### tokenize text for sentiment analysis
     t = time.time()
     texts = [q + r for q,r in zip(game_data['query'], game_data['response'])]
-    sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)    
+    sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)
     timing['time/build_input_sentiment'] = time.time()-t
 
     #### get sentiment score
@@ -212,11 +212,11 @@ for epoch in tqdm(range(int(np.ceil(config["steps"]/config['batch_size'])))):
     rewards = torch.cat(rewards)
     timing['time/get_sentiment_preds'] = time.time()-t
 
-    #### Run PPO training 
+    #### Run PPO training
     t = time.time()
     stats = ppo_trainer.step(query_tensors, response_tensors, rewards)
     timing['time/optimization'] = time.time()-t
-     
+
     #### Log everything
     timing['time/epoch'] = time.time()-t0
     table_rows = [list(r) for r in zip(game_data['query'], game_data['response'], rewards.cpu().tolist())]
@@ -263,12 +263,12 @@ game_data['response (after)'] = [gpt2_tokenizer.decode(response_tensors[i, :]) f
 
 #### sentiment analysis of query/response pairs before/after
 texts = [q + r for q,r in zip(game_data['query'], game_data['response (before)'])]
-sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)    
+sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)
 rewards = sentiment_model.forward(sentiment_inputs, attention_masks)[0][:, 1].detach()
 game_data['rewards (before)'] = rewards.cpu().numpy()
 
 texts = [q + r for q,r in zip(game_data['query'], game_data['response (after)'])]
-sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)    
+sentiment_inputs, attention_masks = build_bert_batch_from_txt(texts, sentiment_tokenizer, device)
 rewards = sentiment_model.forward(sentiment_inputs, attention_masks)[0][:, 1].detach()
 game_data['rewards (after)'] = rewards.cpu().numpy()
 
